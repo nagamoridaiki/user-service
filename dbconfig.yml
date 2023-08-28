@@ -1,0 +1,4 @@
+development:
+  dialect: mysql
+  datasource: hoge:pass@tcp(0.0.0.0:3307)/member_service?parseTime=true
+  dir: migrations

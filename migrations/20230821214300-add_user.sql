@@ -1,0 +1,22 @@
+-- +migrate Up
+
+-- user
+CREATE TABLE IF NOT EXISTS user (
+  user_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT'ユーザーID',
+  user_name VARCHAR(254) UNIQUE NOT NULL COMMENT'ユーザー名',
+  user_name_kana VARCHAR(254) COMMENT'ユーザー名（かな）',
+  display_name VARCHAR(255) COMMENT '画面上表示名',
+  email VARCHAR(255) NOT NULL COMMENT'メールアドレス',
+  birthday DATE COMMENT'誕生日',
+  twitter_id VARCHAR(100) UNIQUE COMMENT 'TwietterのID',
+  login_id VARCHAR(254) UNIQUE COMMENT 'ログインID',
+  pass VARCHAR(254) UNIQUE NOT NULL COMMENT 'ユーザー名',
+
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT'作成日時',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT'更新日時',
+  PRIMARY KEY(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='ユーザー';
+
+-- +migrate Down
+
+DROP TABLE IF EXISTS user;

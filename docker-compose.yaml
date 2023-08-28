@@ -1,0 +1,28 @@
+version: '3'
+services:
+  gwitter_mysql:
+    image: mysql:8.0.19
+    platform: linux/amd64
+    ports:
+      - ${MYSQL_PORT}:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/db/logs:/var/log/mysql
+      - ./docker/db//my.cnf:/etc/mysql/conf.d/my.cnf
+
+    container_name: gwitter_mysql
+    env_file:
+      - .env
+
+  # go-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: go-app-container
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - mysql
+
+volumes:
+  mysql-data:
