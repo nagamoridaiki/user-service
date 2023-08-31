@@ -3,7 +3,7 @@ syntax = "proto3";
 
 package user;
 
-import "google/protobuf/timestamp.proto";
+// import "google/protobuf/timestamp.proto";
 // import "google/protobuf/empty.proto";
 
 option go_package = "./user";
@@ -20,7 +20,7 @@ message User {
     optional string user_name_kana              = 3;
     optional string display_name                = 4;
     string email                                = 5;
-    optional google.protobuf.Timestamp birthday = 6;
+    // optional google.protobuf.Timestamp birthday = 6;
     optional string twitter_id                  = 7;
     optional string login_id                    = 8;
     string pass                                 = 9;

@@ -1,6 +1,6 @@
 version: '3'
 services:
-  gwitter_mysql:
+  user-service-mysql:
     image: mysql:8.0.19
     platform: linux/amd64
     ports:
@@ -10,7 +10,7 @@ services:
       - ./docker/db/logs:/var/log/mysql
       - ./docker/db//my.cnf:/etc/mysql/conf.d/my.cnf
 
-    container_name: gwitter_mysql
+    container_name: user-service-mysql
     env_file:
       - .env
 

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gwitter/user"
 	"log"
 	"net"
+	"user-service/user"
 
 	"google.golang.org/grpc"
 )
@@ -21,8 +21,4 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
-}
-
-func (s *Server) mustEmbedUnimplementedUserServiceServer() {
-	panic("必要なエンドポイントはまだ実装されていません")
 }

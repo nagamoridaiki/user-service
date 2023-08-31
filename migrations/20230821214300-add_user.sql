@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS user (
   user_name_kana VARCHAR(254) COMMENT'ユーザー名（かな）',
   display_name VARCHAR(255) COMMENT '画面上表示名',
   email VARCHAR(255) NOT NULL COMMENT'メールアドレス',
-  birthday DATE COMMENT'誕生日',
+  -- birthday DATE COMMENT'誕生日',
   twitter_id VARCHAR(100) UNIQUE COMMENT 'TwietterのID',
   login_id VARCHAR(254) UNIQUE COMMENT 'ログインID',
   pass VARCHAR(254) UNIQUE NOT NULL COMMENT 'ユーザー名',
