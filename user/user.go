@@ -4,28 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"time"
 
-	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type Server struct {
 	User UnimplementedUserServiceServer
-}
-
-type UserStruct struct {
-	UserId       int32
-	UserName     string
-	UserNameKana *string
-	DisplayName  *string
-	Email        string
-	TwitterId    *string
-	LoginId      *string
-	Pass         string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
 }
 
 func (s *Server) GetUser(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
@@ -37,44 +22,34 @@ func (s *Server) GetUser(ctx context.Context, in *GetUserRequest) (*GetUserRespo
 	if err != nil {
 		panic(err.Error())
 	}
-	defer db.Close()
 
-	dialect := goqu.Dialect("mysql")
-	sql, _, err := dialect.From("user").Where(goqu.Ex{"user_id": 2}).ToSQL()
+	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
+	log.Println("データベース接続完了")
 
 	// SQLを実行して結果を取得
 
 	// SQLの実行
-	rows, err := db.Query(sql)
+	user := User{}
+	err = db.QueryRow(`select * from user where user_id=1`).Scan(
+		&user.UserId,
+		&user.UserName,
+		&user.UserNameKana,
+		&user.DisplayName,
+		&user.Email,
+		&user.TwitterId,
+		&user.LoginId,
+		&user.Pass,
+	)
+
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var user UserStruct
-		err := rows.Scan(&user.UserId, &user.UserName, &user.UserNameKana, &user.DisplayName, &user.Email, &user.TwitterId, &user.LoginId, &user.Pass, &user.CreatedAt, &user.UpdatedAt)
-
-		if err != nil {
-			panic(err.Error())
-		}
-		log.Print(user)
-		log.Println(&user.UserId, &user.UserName, &user.UserNameKana, &user.DisplayName, &user.Email, &user.TwitterId, &user.LoginId, &user.Pass, &user.CreatedAt, &user.UpdatedAt)
-
+		log.Fatalln("データベースからの取得失敗エラー: ", err)
 	}
 
-	// 仮のレスポンスを作成して返す
-	user := &User{
-		UserId:   1,
-		UserName: "userName",
-		Email:    "email",
-		Pass:     "pass",
-	}
 	response := &GetUserResponse{
-		User: user,
+		User: &user,
 	}
 
 	log.Print(response)
