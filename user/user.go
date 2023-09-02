@@ -2,8 +2,8 @@ package user
 
 import (
 	"context"
-	"database/sql"
 	"log"
+	"user-service/infra"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
@@ -16,16 +16,11 @@ type Server struct {
 
 func (s *Server) GetUser(ctx context.Context, req *GetUserRequest) (*GetUserResponse, error) {
 
-	// データベース接続の設定
-	db, err := sql.Open("mysql", "hoge:pass@tcp(127.0.0.1:3307)/member_service?parseTime=true")
+	db, err := infra.NewDBConnection()
 	if err != nil {
-		log.Fatalln("データベースの接続エラー: ", err)
+		log.Fatalf("データベースの接続エラー: %v", err)
 	}
-
-	err = db.Ping()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	defer db.Close()
 
 	dialect := goqu.Dialect("mysql")
 	sql, _, err := dialect.From("user").Where(goqu.C("user_id").Eq(req.UserId)).ToSQL()
