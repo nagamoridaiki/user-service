@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"gwitter/user"
 	"log"
+	"user-service/user"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
