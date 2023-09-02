@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -13,27 +14,27 @@ type Server struct {
 	User UnimplementedUserServiceServer
 }
 
-func (s *Server) GetUser(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
-	// ここでユーザー情報を取得する処理を実装する
-	// MySQLのDialectオブジェクトを作成
+func (s *Server) GetUser(ctx context.Context, req *GetUserRequest) (*GetUserResponse, error) {
 
 	// データベース接続の設定
 	db, err := sql.Open("mysql", "hoge:pass@tcp(127.0.0.1:3307)/member_service?parseTime=true")
 	if err != nil {
-		panic(err.Error())
+		log.Fatalln("データベースの接続エラー: ", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println("データベース接続完了")
 
-	// SQLを実行して結果を取得
+	dialect := goqu.Dialect("mysql")
+	sql, _, err := dialect.From("user").Where(goqu.C("user_id").Eq(req.UserId)).ToSQL()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// SQLの実行
 	user := User{}
-	err = db.QueryRow(`select * from user where user_id=1`).Scan(
+	err = db.QueryRow(sql).Scan(
 		&user.UserId,
 		&user.UserName,
 		&user.UserNameKana,
