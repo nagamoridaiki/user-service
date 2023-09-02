@@ -1,5 +1,5 @@
-user/user_grpc.pb.go
-user/user.pb.go
+# user/user_grpc.pb.go
+# user/user.pb.go
 .env
 
 docker/db/data/*
