@@ -1,9 +1,10 @@
-package user
+package controller
 
 import (
 	"context"
 	"log"
 	"user-service/infra"
+	"user-service/user"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
@@ -11,10 +12,10 @@ import (
 )
 
 type Server struct {
-	User UnimplementedUserServiceServer
+	user.UserServiceServer
 }
 
-func (s *Server) GetUser(ctx context.Context, req *GetUserRequest) (*GetUserResponse, error) {
+func (s *Server) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
 
 	db, err := infra.NewDBConnection()
 	if err != nil {
@@ -28,31 +29,27 @@ func (s *Server) GetUser(ctx context.Context, req *GetUserRequest) (*GetUserResp
 		log.Fatal(err)
 	}
 
-	user := User{}
+	var userData user.User
 	err = db.QueryRow(sql).Scan(
-		&user.UserId,
-		&user.UserName,
-		&user.UserNameKana,
-		&user.DisplayName,
-		&user.Email,
-		&user.TwitterId,
-		&user.LoginId,
-		&user.Pass,
+		&userData.UserId,
+		&userData.UserName,
+		&userData.UserNameKana,
+		&userData.DisplayName,
+		&userData.Email,
+		&userData.TwitterId,
+		&userData.LoginId,
+		&userData.Pass,
 	)
 
 	if err != nil {
 		log.Fatalln("データベースからの取得失敗エラー: ", err)
 	}
 
-	response := &GetUserResponse{
-		User: &user,
+	response := &user.GetUserResponse{
+		User: &userData,
 	}
 
 	log.Print(response)
 
 	return response, nil
-}
-
-func (s *Server) mustEmbedUnimplementedUserServiceServer() {
-	panic("必要なエンドポイントはまだ実装されていません")
 }
