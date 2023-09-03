@@ -1,4 +1,4 @@
-package controller
+package repository
 
 import (
 	"context"
@@ -11,11 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Server struct {
-	user.UserServiceServer
-}
-
-func (s *Server) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
+func GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
 
 	db, err := infra.NewDBConnection()
 	if err != nil {
