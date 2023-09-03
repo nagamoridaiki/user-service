@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net"
+
+	"user-service/domain/controller"
 	"user-service/user"
 
 	"google.golang.org/grpc"
@@ -14,7 +16,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	s := user.Server{}
+	s := controller.Server{}
 	grpcServer := grpc.NewServer()
 	user.RegisterUserServiceServer(grpcServer, &s)
 
