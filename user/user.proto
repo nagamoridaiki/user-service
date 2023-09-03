@@ -35,20 +35,19 @@ message GetUserResponse {
 }
 
 
-// message CreateUserRequest{
-//     string user_name                            = 1;
-//     optional string user_name_kana              = 2;
-//     optional string display_name                = 3;
-//     string email                                = 4;
-//     optional google.protobuf.Timestamp birthday = 5;
-//     optional string twitter_id                  = 6;
-//     optional string login_id                    = 7;
-//     string pass                                 = 8;
-// }
+message CreateUserRequest{
+    string user_name                            = 1;
+    optional string user_name_kana              = 2;
+    optional string display_name                = 3;
+    string email                                = 4;
+    optional string twitter_id                  = 6;
+    optional string login_id                    = 7;
+    string pass                                 = 8;
+}
 
-// message CreateUserResponse{
-//     User user = 1;
-// }
+message CreateUserResponse{
+    User user = 1;
+}
 
 // message UpdateUserRequest{
 //     int32 user_id                               = 1;
@@ -93,7 +92,7 @@ message GetUserResponse {
 
 service userService{
     rpc GetUser (GetUserRequest) returns (GetUserResponse) {};
-    //rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {};
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {};
     //rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {};
     //rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty) {};
     //rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {};
