@@ -11,7 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
+func GetUser(ctx context.Context, req *user.GetUserRequest) (*user.User, error) {
 
 	db, err := infra.NewDBConnection()
 	if err != nil {
@@ -38,14 +38,8 @@ func GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserRespon
 	)
 
 	if err != nil {
-		log.Fatalln("データベースからの取得失敗エラー: ", err)
+		log.Fatalln("getUser repositoryの取得に失敗しました。: ", err)
 	}
 
-	response := &user.GetUserResponse{
-		User: &userData,
-	}
-
-	log.Print(response)
-
-	return response, nil
+	return &userData, nil
 }

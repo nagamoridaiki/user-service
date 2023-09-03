@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"user-service/domain/repository"
 	"user-service/user"
 
@@ -9,7 +10,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
+func GetUser(ctx context.Context, req *user.GetUserRequest) (*user.User, error) {
 
-	return repository.GetUser(ctx, req)
+	user, err := repository.GetUser(ctx, req)
+
+	if err != nil {
+		log.Fatalf("GetUser repositoryの呼び出しエラー: %v", err)
+	}
+
+	return user, nil
 }
