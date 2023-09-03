@@ -16,10 +16,14 @@ type Server struct {
 
 func (s *Server) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
 
-	response, err := usecase.GetUser(ctx, req)
-	
+	res, err := usecase.GetUser(ctx, req)
+
 	if err != nil {
 		log.Fatalf("GetUser usecaseの呼び出しエラー: %v", err)
+	}
+
+	response := &user.GetUserResponse{
+		User: res,
 	}
 
 	return response, nil
