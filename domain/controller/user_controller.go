@@ -28,3 +28,22 @@ func (s *Server) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.G
 
 	return response, nil
 }
+
+func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
+	var res *user.User
+	var err error
+
+	// TODO: バリデーションの実装
+
+	res, err = usecase.CreateUser(ctx, req)
+
+	if err != nil {
+		log.Fatalf("CreateUser usecaseの呼び出しエラー: %v", err)
+	}
+
+	response := &user.CreateUserResponse{
+		User: res,
+	}
+
+	return response, nil
+}
