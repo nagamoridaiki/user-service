@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"log"
+	"user-service/domain/controller/form"
 	"user-service/domain/usecase"
 	"user-service/user"
 
@@ -32,8 +33,13 @@ func (s *Server) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.G
 func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
 	var res *user.User
 	var err error
+	var user_form error
 
-	// TODO: バリデーションの実装
+	user_form = form.UserInputForm(req)
+	if user_form != nil {
+		log.Fatalf("Userの入力に誤りがあります: %v", user_form)
+		return nil, err
+	}
 
 	res, err = usecase.CreateUser(ctx, req)
 
