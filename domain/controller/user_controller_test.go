@@ -77,15 +77,21 @@ func TestUser(t *testing.T) {
 	expectedUser := &user.User{
 		UserId:       10,
 		UserName:     "test1",
-		UserNameKana: proto.String("kana1"),    // ポインタ型の文字列ポインタを使用
-		DisplayName:  proto.String("display1"), // ポインタ型の文字列ポインタを使用
+		UserNameKana: proto.String("kana1"),
+		DisplayName:  proto.String("display1"),
 		Email:        "john1@example.com",
-		TwitterId:    proto.String("twitter1"), // ポインタ型の文字列ポインタを使用
-		LoginId:      proto.String("login1"),   // ポインタ型の文字列ポインタを使用
+		TwitterId:    proto.String("twitter1"),
+		LoginId:      proto.String("login1"),
 		Pass:         "pass1",
 	}
 
 	if !reflect.DeepEqual(response.User, expectedUser) {
 		t.Errorf("Unexpected result. Got: %+v, Expected: %+v", response.User, expectedUser)
+	}
+
+	// テストデータのクリーンアップ
+	_, err = db.Exec("DELETE FROM user WHERE user_id = ?", req.UserId)
+	if err != nil {
+		t.Fatalf("Failed to clean up test data: %v", err)
 	}
 }
