@@ -3,58 +3,63 @@ package controller
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
 	"reflect"
-	"regexp"
 	"testing"
 	"user-service/user"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jmoiron/sqlx"
 	"google.golang.org/protobuf/proto"
 )
 
 var db *sql.DB
 var mock sqlmock.Sqlmock
 
-func TestMain(m *testing.M) {
-	// テストデータのセットアップ
-	var err error
-	db, mock, err = sqlmock.New()
+func setupTestDatabase() (*sqlx.DB, error) {
+
+	db, err := sqlx.Open("mysql", "hoge:pass@tcp(127.0.0.1:3307)/member_service")
 	if err != nil {
-		fmt.Println("failed to open sqlmock database:", err)
-	}
-	defer db.Close()
-
-	// モックの設定
-	rows := sqlmock.NewRows([]string{
-		"user_id", "user_name", "user_name_kana", "display_name", "email",
-		"twitter_id", "login_id", "pass",
-	}).
-		AddRow(10, "test1", "kana1", "display1", "john1@example.com", "twitter1", "login1", "pass1").
-		AddRow(20, "test2", "kana2", "display2", "john2@example.com", "twitter2", "login2", "pass2")
-
-	mock.ExpectQuery("SELECT").WillReturnRows(rows)
-
-	mock.ExpectBegin()
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `user` (user_id, user_name, user_name_kana, display_name, email, twitter_id, login_id, pass) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")).
-		WithArgs(10, "test1", "kana1", "display1", "john1@example.com", "twitter1", "login1", "pass1").
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectCommit()
-
-	// テスト実行
-	code := m.Run()
-
-	// モックのクエリ実行を検証
-	if err := mock.ExpectationsWereMet(); err != nil {
-		fmt.Printf("there were unfulfilled expectations: %s", err)
+		return nil, err
 	}
 
-	// テストの結果を返す
-	os.Exit(code)
+	// テーブルの作成
+	_, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS user (
+            user_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT'ユーザーID',
+			user_name VARCHAR(254) UNIQUE NOT NULL COMMENT'ユーザー名',
+			user_name_kana VARCHAR(254) COMMENT'ユーザー名（かな）',
+			display_name VARCHAR(255) COMMENT '画面上表示名',
+			email VARCHAR(255) NOT NULL COMMENT'メールアドレス',
+			twitter_id VARCHAR(100) UNIQUE COMMENT 'TwietterのID',
+			login_id VARCHAR(254) UNIQUE COMMENT 'ログインID',
+			pass VARCHAR(254) UNIQUE NOT NULL COMMENT 'ユーザー名',
+
+			PRIMARY KEY(user_id)
+        )
+    `)
+	if err != nil {
+		return nil, err
+	}
+
+	// ダミーレコードの挿入
+	_, err = db.Exec(`INSERT INTO user
+    (user_id, user_name, user_name_kana, display_name, email, twitter_id, login_id, pass)
+    VALUES (10, 'test1', 'kana1', 'display1', 'john1@example.com', 'twitter1', 'login1', 'pass1')`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
 
 func TestUser(t *testing.T) {
+
+	db, err := setupTestDatabase()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
 
 	// テスト対象のコントローラーを作成
 	controller := &Server{} // あなたの実際のコントローラーに置き換える必要があります
