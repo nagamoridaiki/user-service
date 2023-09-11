@@ -4,26 +4,25 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
+	"user-service/testconfig"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	godotenv.Load()
 }
 
 func NewDBConnection() (*sql.DB, error) {
+	config := testconfig.NewConfig()
 
-	mysqlUser := os.Getenv("MYSQL_USER")
-	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
-	mysqlHost := os.Getenv("MYSQL_HOST")
-	mysqlPort := os.Getenv("MYSQL_PORT")
-	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
+	mysqlUser := config.MySQLUser
+	mysqlPassword := config.MySQLPassword
+	mysqlHost := config.MySQLHost
+	mysqlPort := config.MySQLPort
+	mysqlDatabase := config.MySQLDatabase
 
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
 
