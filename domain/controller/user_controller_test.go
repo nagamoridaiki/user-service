@@ -3,8 +3,10 @@ package controller
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"reflect"
 	"testing"
+	"user-service/testconfig"
 	"user-service/user"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -15,9 +17,26 @@ import (
 var db *sql.DB
 var mock sqlmock.Sqlmock
 
+func dummyTestUser() *user.User {
+	return &user.User{
+		UserId:       10,
+		UserName:     "test1",
+		UserNameKana: proto.String("kana1"),
+		DisplayName:  proto.String("display1"),
+		Email:        "john1@example.com",
+		TwitterId:    proto.String("twitter1"),
+		LoginId:      proto.String("login1"),
+		Pass:         "pass1",
+	}
+}
+
 func setupTestDatabase() (*sqlx.DB, error) {
 
-	db, err := sqlx.Open("mysql", "hoge:pass@tcp(127.0.0.1:3307)/member_service")
+	conf := testconfig.NewConfig()
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", conf.MySQLUser, conf.MySQLPassword, conf.MySQLHost, conf.MySQLPort, conf.MySQLDatabase)
+
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +60,13 @@ func setupTestDatabase() (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	// ダミーレコードの挿入
+	du := dummyTestUser()
+	testValue := fmt.Sprintf("%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s'",
+		du.UserId, du.UserName, *du.UserNameKana, *du.DisplayName, du.Email, *du.TwitterId, *du.LoginId, du.Pass)
+
 	_, err = db.Exec(`INSERT INTO user
     (user_id, user_name, user_name_kana, display_name, email, twitter_id, login_id, pass)
-    VALUES (10, 'test1', 'kana1', 'display1', 'john1@example.com', 'twitter1', 'login1', 'pass1')`)
+    VALUES (` + testValue + `)`)
 
 	if err != nil {
 		return nil, err
@@ -73,20 +95,8 @@ func TestUser(t *testing.T) {
 		t.Fatalf("GetUser failed: %v", err)
 	}
 
-	// 期待される結果と比較
-	expectedUser := &user.User{
-		UserId:       10,
-		UserName:     "test1",
-		UserNameKana: proto.String("kana1"),
-		DisplayName:  proto.String("display1"),
-		Email:        "john1@example.com",
-		TwitterId:    proto.String("twitter1"),
-		LoginId:      proto.String("login1"),
-		Pass:         "pass1",
-	}
-
-	if !reflect.DeepEqual(response.User, expectedUser) {
-		t.Errorf("Unexpected result. Got: %+v, Expected: %+v", response.User, expectedUser)
+	if !reflect.DeepEqual(response.User, dummyTestUser()) {
+		t.Errorf("Unexpected result. Got: %+v, Expected: %+v", response.User, dummyTestUser())
 	}
 
 	// テストデータのクリーンアップ
