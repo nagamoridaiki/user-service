@@ -3,8 +3,10 @@ package controller
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"reflect"
 	"testing"
+	"user-service/testconfig"
 	"user-service/user"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -17,7 +19,17 @@ var mock sqlmock.Sqlmock
 
 func setupTestDatabase() (*sqlx.DB, error) {
 
-	db, err := sqlx.Open("mysql", "hoge:pass@tcp(127.0.0.1:3307)/member_service")
+	config := testconfig.NewConfig()
+
+	db_user := config.MySQLUser
+	db_pass := config.MySQLPassword
+	db_host := config.MySQLHost
+	db_port := config.MySQLPort
+	db_database := config.MySQLDatabase
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", db_user, db_pass, db_host, db_port, db_database)
+
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
